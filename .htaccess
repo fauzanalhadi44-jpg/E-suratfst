@@ -1,0 +1,8 @@
+Options -Indexes
+<FilesMatch "\.(sql|md)$">
+  Require all denied
+</FilesMatch>
+# Aktifkan 3 baris di bawah SETELAH SSL/HTTPS aktif di hosting:
+# RewriteEngine On
+# RewriteCond %{HTTPS} off
+# RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
