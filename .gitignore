@@ -1,0 +1,10 @@
+
+# Konfigurasi database
+config/config.php
+
+# Dokumen upload mahasiswa
+uploads/*
+
+# File sistem
+.DS_Store
+Thumbs.db
