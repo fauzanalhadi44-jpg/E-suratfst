@@ -51,3 +51,6 @@ penerbitan surat dalam format PDF.
 | Suci Ramadhani | 2417020071 | UI/UX |
 
 Dosen Pengampu: Haditya Prasetyo, S.Kom., M.Kom.
+
+Perubahan dilakukan oleh collaborator Farhatatunnahri.
+
