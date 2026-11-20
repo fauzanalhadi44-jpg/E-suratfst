@@ -12,6 +12,16 @@ foreach ($pdo->query('SELECT * FROM persyaratan ORDER BY id_persyaratan')->fetch
 $errors = []; $idj = $ulang ? (int)$ulang['id_jenis'] : (int)($_POST['id_jenis'] ?? 0);
 $tujuan = trim($_POST['tujuan'] ?? ($ulang['tujuan'] ?? '')); $keperluan = trim($_POST['keperluan'] ?? ($ulang['keperluan'] ?? ''));
 
+// Status orang tua PNS: menentukan apakah persyaratan berkondisi 'anak_pns' berlaku.
+$anakPns = false;
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $anakPns = ($_POST['anak_pns'] ?? '') === 'ya';
+} elseif ($ulang) {
+    foreach ($syarat[$idj] ?? [] as $r) {
+        if ($r['kondisi'] === 'anak_pns' && isset($docs[$r['id_persyaratan']])) $anakPns = true;
+    }
+}
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     csrf_check();
     if (!isset($syarat[$idj])) $errors[] = 'Pilih jenis surat.';
@@ -19,6 +29,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($keperluan === '') $errors[] = 'Keperluan wajib diisi.';
     $simpan = [];
     foreach ($syarat[$idj] ?? [] as $r) {
+        if ($r['kondisi'] === 'anak_pns' && !$anakPns) continue; // tidak berlaku bagi mahasiswa non-PNS
         $rid = $r['id_persyaratan'];
         $ada = isset($_FILES['dok']['error'][$rid]) && $_FILES['dok']['error'][$rid] !== UPLOAD_ERR_NO_FILE;
         $lama = isset($docs[$rid]) && $docs[$rid]['status_pemeriksaan'] !== 'tidak_sesuai';
@@ -75,22 +86,48 @@ require __DIR__ . '/../includes/header.php'; ?>
 <label>Tujuan surat (ditujukan kepada / untuk apa)</label><input type="text" name="tujuan" value="<?= e($tujuan) ?>" required>
 <label>Keperluan</label><textarea name="keperluan" required><?= e($keperluan) ?></textarea>
 <h2 style="margin-top:1.25rem">Dokumen persyaratan</h2><p class="muted">PDF, JPG, atau PNG. Maksimal 2 MB per file.</p>
-<?php foreach ($syarat as $jid => $list): ?><div class="grp" data-j="<?= $jid ?>" <?= $idj == $jid ? '' : 'hidden' ?>>
-<?php foreach ($list as $r): $d = $docs[$r['id_persyaratan']] ?? null; ?>
+<?php foreach ($syarat as $jid => $list):
+    $aktif = ($idj == $jid);
+    $punyaPns = in_array('anak_pns', array_column($list, 'kondisi'), true); ?>
+<div class="grp" data-j="<?= $jid ?>" <?= $aktif ? '' : 'hidden' ?>>
+<?php if ($punyaPns): ?>
+<label>Apakah orang tua Anda berstatus PNS?</label>
+<select name="anak_pns" class="pns" <?= $aktif ? '' : 'disabled' ?>>
+<option value="tidak">Tidak</option>
+<option value="ya" <?= $anakPns ? 'selected' : '' ?>>Ya</option></select>
+<?php endif; ?>
+<?php foreach ($list as $r):
+    $d = $docs[$r['id_persyaratan']] ?? null;
+    $perlu = $aktif && ($r['kondisi'] !== 'anak_pns' || $anakPns); ?>
+<div class="syarat" data-kondisi="<?= e((string)$r['kondisi']) ?>" <?= $perlu ? '' : 'hidden' ?>>
 <label><?= e($r['nama_persyaratan']) ?>
 <?php if ($d): ?> <?= $d['status_pemeriksaan'] === 'sesuai' ? '<span class="pill hijau">sesuai</span>' : ($d['status_pemeriksaan'] === 'tidak_sesuai' ? '<span class="pill merah">perlu diganti</span>' : '<span class="pill abu">belum diperiksa</span>') ?><?php endif; ?></label>
 <?php if ($d && $d['catatan']): ?><div class="muted">Catatan admin: <?= e($d['catatan']) ?></div><?php endif; ?>
-<input type="file" name="dok[<?= $r['id_persyaratan'] ?>]" accept=".pdf,.jpg,.jpeg,.png" <?= $idj == $jid ? '' : 'disabled' ?>>
+<input type="file" name="dok[<?= $r['id_persyaratan'] ?>]" accept=".pdf,.jpg,.jpeg,.png" <?= $perlu ? '' : 'disabled' ?>>
 <?php if ($d && $d['status_pemeriksaan'] !== 'tidak_sesuai'): ?><div class="muted">Kosongkan jika tetap memakai file yang sudah diunggah.</div><?php endif; ?>
+</div>
 <?php endforeach; ?></div><?php endforeach; ?>
 <p><button class="btn" type="submit"><?= $ulang ? 'Kirim Ulang' : 'Kirim Pengajuan' ?></button></p></form>
 <script>
 var sel = document.getElementById('jenis');
-if (sel) sel.addEventListener('change', function () {
+var jenisTetap = '<?= (int)$idj ?>';
+function terapkan() {
+  var aktif = sel ? sel.value : jenisTetap;
   document.querySelectorAll('.grp').forEach(function (g) {
-    var on = g.getAttribute('data-j') === sel.value; g.hidden = !on;
-    g.querySelectorAll('input[type=file]').forEach(function (i) { i.disabled = !on; });
+    var on = g.getAttribute('data-j') === aktif;
+    g.hidden = !on;
+    var pns = g.querySelector('select.pns');
+    if (pns) pns.disabled = !on;
+    var anak = on && pns && pns.value === 'ya';
+    g.querySelectorAll('.syarat').forEach(function (s) {
+      var perlu = on && (s.getAttribute('data-kondisi') !== 'anak_pns' || anak);
+      s.hidden = !perlu;
+      s.querySelectorAll('input[type=file]').forEach(function (i) { i.disabled = !perlu; });
+    });
   });
-});
+}
+if (sel) sel.addEventListener('change', terapkan);
+document.querySelectorAll('select.pns').forEach(function (p) { p.addEventListener('change', terapkan); });
+terapkan();
 </script>
 <?php require __DIR__ . '/../includes/footer.php';
