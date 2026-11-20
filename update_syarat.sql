@@ -1,4 +1,6 @@
-
+-- Memperbarui daftar persyaratan pada database yang SUDAH terpasang. Untuk XAMPP (MariaDB).
+-- Aman dijalankan lebih dari sekali. Cara: phpMyAdmin > tab Import > pilih file ini > Import.
+USE surat_fst;
 ALTER TABLE persyaratan ADD COLUMN IF NOT EXISTS kondisi ENUM('semua','anak_pns','bukan_pns','nonaktif') NOT NULL DEFAULT 'semua';
 ALTER TABLE persyaratan MODIFY kondisi ENUM('semua','anak_pns','bukan_pns','nonaktif') NOT NULL DEFAULT 'semua';
 ALTER TABLE pengajuan ADD COLUMN IF NOT EXISTS anak_pns TINYINT(1) NOT NULL DEFAULT 0;
@@ -20,4 +22,3 @@ INSERT INTO persyaratan (id_jenis, nama_persyaratan, kondisi) SELECT 4,'Berita a
 UPDATE persyaratan SET kondisi='semua' WHERE id_jenis=5 AND nama_persyaratan='Surat permohonan (dibuat mahasiswa)';
 INSERT INTO persyaratan (id_jenis, nama_persyaratan, kondisi) SELECT 5,'Surat permohonan (dibuat mahasiswa)','semua' FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM persyaratan WHERE id_jenis=5 AND nama_persyaratan='Surat permohonan (dibuat mahasiswa)');
 UPDATE persyaratan SET kondisi='semua' WHERE id_jenis=7 AND nama_persyaratan='Surat permohonan (dibuat mahasiswa)';
-INSERT INTO persyaratan (id_jenis, nama_persyaratan, kondisi) SELECT 7,'Surat permohonan (dibuat mahasiswa)','semua' FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM persyaratan WHERE id_jenis=7 AND nama_persyaratan='Surat permohonan (dibuat mahasiswa)');
