@@ -103,12 +103,13 @@ INSERT INTO jenis_surat (nama_jenis) VALUES
 ('Surat Permohonan Izin Observasi');
 
 -- CONTOH persyaratan: konfirmasikan daftar sebenarnya dengan Admin FST (Ibu Titin)
-INSERT INTO persyaratan (id_jenis, nama_persyaratan) VALUES
-(1,'Kartu Tanda Mahasiswa (KTM)'),(1,'KRS semester berjalan'),(1,'Bukti pembayaran UKT'),
-(2,'Kartu Tanda Mahasiswa (KTM)'),(2,'KRS semester berjalan'),(2,'Surat pernyataan tidak menerima beasiswa'),
-(3,'Kartu Tanda Mahasiswa (KTM)'),(3,'KRS semester berjalan'),(3,'Transkrip nilai sementara'),
-(4,'Kartu Tanda Mahasiswa (KTM)'),(4,'Bukti yudisium / SK kelulusan'),(4,'Transkrip nilai'),
-(5,'Kartu Tanda Mahasiswa (KTM)'),(5,'Proposal / outline penelitian'),(5,'Surat persetujuan pembimbing'),
-(6,'Kartu Tanda Mahasiswa (KTM)'),(6,'KRS semester berjalan'),(6,'Proposal / rencana kerja praktek'),
-(7,'Kartu Tanda Mahasiswa (KTM)'),(7,'KRS semester berjalan'),(7,'Rencana / instrumen observasi');
+INSERT INTO persyaratan (id_jenis, nama_persyaratan, kondisi) VALUES
+(1, 'Bukti pembayaran UKT', 'semua'),
+(2, 'Bukti pembayaran UKT', 'semua'),
+(2, 'SK PNS orang tua', 'anak_pns'),
+(3, 'Bukti pembayaran UKT', 'semua'),
+(4, 'Berita acara pelaksanaan ujian skripsi', 'semua'),
+(5, 'Surat permohonan dari mahasiswa', 'semua'),
+(6, 'Bukti pembayaran UKT', 'semua'),
+(7, 'Surat permohonan dari mahasiswa', 'semua');
 -- Akun admin dibuat lewat setup.php (sekali saja), bukan lewat SQL.
