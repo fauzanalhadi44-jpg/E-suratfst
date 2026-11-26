@@ -1,7 +1,7 @@
 <?php
 // ====== SESUAIKAN BAGIAN INI ======
 define('DB_HOST', 'localhost');
-define('DB_NAME', 'surat_fst');
+define('DB_NAME', 'suratfst');
 define('DB_USER', 'root');
 define('DB_PASS', '');
 define('BASE_URL', '/suratfst');   // tanpa slash di akhir. Isi '' jika aplikasi ada di root domain
