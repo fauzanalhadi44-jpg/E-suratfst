@@ -125,11 +125,9 @@ $error = $error ?? '';
           <select id="prodi" name="prodi" required>
             <option value="" disabled selected>Pilih program studi</option>
             <!-- GANTI dengan daftar prodi yang sudah ada di kodemu -->
+             <option>Matematika</option>
             <option>Sistem Informasi</option>
-            <option>Matematika</option>
-            <option>Biologi</option>
-            <option>Kimia</option>
-            <option>Fisika</option>
+            <option>Aktuaria</option>
           </select>
         </div>
         <div class="field">
